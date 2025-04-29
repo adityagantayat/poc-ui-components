@@ -67,25 +67,25 @@ const Home = () => {
           <option value="pop">Pop</option>
         </select>
       </div>
-      <div className='flex items-center justify-between mt-4 w-full p-10'>
+      <div className='flex flex-wrap items-center justify-between mt-4 w-full p-10'>
         <CustomButton text='Success Toast'
             onClick={() => handleAddToast('success')}
-            className="bg-green-500 text-white"
+            className="bg-green-500 text-white flex-1"
         />
         
         <CustomButton text='Warning Toast'
             onClick={() => handleAddToast('warning')}
-            className="bg-yellow-500 text-black"
+            className="bg-yellow-500 text-black flex-1"
         />
         
         <CustomButton text='Error Toast'
             onClick={() => handleAddToast('error')}
-            className="bg-red-500 text-white"
+            className="bg-red-500 text-white flex-1"
         />
         
         <CustomButton text='Info Toast'
             onClick={() => handleAddToast('info')}
-            className="bg-blue-400 text-white"
+            className="bg-blue-400 text-white flex-1"
         />
         
 

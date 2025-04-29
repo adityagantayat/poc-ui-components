@@ -2,7 +2,7 @@ import clsx from "clsx";
 export const CustomButton: React.FC<{text: string, className: string, onClick?: () => void;}>  = ({ text, className, onClick }) => {
  
     return (
-      <button onClick={onClick} className={clsx("rounded-2xl border-2 border-dotted border-black px-6 py-3 font-semibold uppercase text-black transition-all duration-300 hover:translate-x-[-4px] hover:translate-y-[-4px] hover:rounded-md hover:shadow-[4px_4px_0px_black] active:translate-x-[0px] active:translate-y-[0px] active:rounded-2xl active:shadow-none"
+      <button onClick={onClick} className={clsx("rounded-2xl border-2 border-dotted border-black mx-2 my-2 px-6 py-3 font-semibold uppercase text-black transition-all duration-300 hover:translate-x-[-4px] hover:translate-y-[-4px] hover:rounded-md hover:shadow-[4px_4px_0px_black] active:translate-x-[0px] active:translate-y-[0px] active:rounded-2xl active:shadow-none"
                         ,className)}>
         {text}
       </button>
