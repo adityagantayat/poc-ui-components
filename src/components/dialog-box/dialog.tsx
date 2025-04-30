@@ -94,7 +94,7 @@ export const Dialog = ({ show, animationKey = 'popIn',
         //   {...(isSplitAnimation ? anim.overlay : anim)}
         >
           <motion.div
-            className="bg-white rounded-xl shadow-xl max-w-md w-full max-h-[70vh] flex flex-col"
+            className="bg-white rounded-xl shadow-xl max-w-md w-full max-h-[70vh] flex flex-col m-4"
             {...anim}
           >
             <div className={`flex items-center justify-center rounded-t-xl ${headerGradient(dialogType)} p-2`}
