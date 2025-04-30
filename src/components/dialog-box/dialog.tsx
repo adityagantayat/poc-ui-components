@@ -14,7 +14,7 @@ export type AnimationKey = 'popIn'
     initial: { scale: 0.8, opacity: 0 },
     animate: { scale: 1, opacity: 1 },
     exit: { scale: 0.9, opacity: 0 },
-    transition: { type: 'spring', stiffness: 300, damping: 25 },
+    transition: { type: 'spring', stiffness: 300, damping: 25,ease: 'easeInOut' },
   },
   springPop: {
     initial: { y: 100, opacity: 0, scale:0.2 },
@@ -91,7 +91,6 @@ export const Dialog = ({ show, animationKey = 'popIn',
       {show && (
         <div
           className="fixed inset-0 bg-black/50 flex items-center justify-center z-50"
-        //   {...(isSplitAnimation ? anim.overlay : anim)}
         >
           <motion.div
             className="bg-white rounded-xl shadow-xl max-w-md w-full max-h-[70vh] flex flex-col m-4"

@@ -5,21 +5,33 @@ import { AnimatePresence } from 'framer-motion';
 interface ToastManagerProps {
   maxToasts: number; // Maximum number of toasts to display at once
 }
-interface ToastProps { id: number; message: string; variant: 'success' | 'error' | 'warning' | 'info'; 
-  animation: 'slide' | 'fade' | 'bounce' | 'pop', mode: 'dark' | 'light', 
-  icon: React.ReactNode}
+interface ToastProps { 
+  id: number; message: string; variant: 'success' | 'error' | 'warning' | 'info'; 
+  animation: 'slide' | 'fade' | 'bounce' | 'pop', 
+  mode: 'dark' | 'light', 
+  icon: React.ReactNode,
+  appearance?: 'glow' | 'gradient';
+  gradientColor?: string;
+  duration?: number;
+}
+export type ToastDataArgs = Omit<ToastProps, 'id'>;
+
+export interface ToastManagerRef {
+  addToast: (data: ToastDataArgs) => void;
+}
   
-const ToastManager = forwardRef<any, ToastManagerProps>(({ maxToasts }, ref) => {
+const ToastManager = forwardRef<ToastManagerRef, ToastManagerProps>(({ maxToasts }, ref) => {
     const [toasts, setToasts] = useState<ToastProps[]>([]);
   
     // Expose the addToast function to the parent via ref
     useImperativeHandle(ref, () => ({
-      addToast: (message: string, variant: 'success' | 'error' | 'warning' | 'info', animation: 'slide' | 'fade' | 'bounce' | 'pop', mode: 'dark' | 'light', icon: React.ReactNode) => {
+      addToast: (data: ToastDataArgs) => {
+        const { message, variant, animation, mode, icon, appearance = 'glow', gradientColor = 'rgba(5, 1, 1, 1)', duration = 4000 } = data;
         setToasts((prevToasts) => {
           if (prevToasts.length >= maxToasts) {
-            return [{ id: Date.now(), message, variant, animation, mode, icon }, ...prevToasts.slice(0,-1)];
+            return [{ id: Date.now(), message, variant, animation, mode, icon, appearance, gradientColor, duration }, ...prevToasts.slice(0,-1)];
           }
-          return [{ id: Date.now(), message, variant, animation, mode, icon }, ...prevToasts];
+          return [{ id: Date.now(), message, variant, animation, mode, icon, appearance, gradientColor, duration }, ...prevToasts];
         });
       },
     }));
@@ -41,6 +53,9 @@ const ToastManager = forwardRef<any, ToastManagerProps>(({ maxToasts }, ref) => 
             onClose={() => removeToast(toast.id)}
             icon={toast.icon}
             mode={toast.mode}
+            appearance={toast.appearance}
+            gradientColor={toast.gradientColor}
+            duration={toast.duration}
           />
         ))}
         </AnimatePresence>

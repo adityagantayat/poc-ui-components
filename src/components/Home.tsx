@@ -1,15 +1,17 @@
 import { useRef, useState } from 'react'
 import BadgeComponent from './badge/BadgeComponent';
 import { AlertCircleIcon, BellIcon, CircleAlertIcon, CircleCheckBig, FlagIcon, MailIcon, MessageSquareWarningIcon, OctagonXIcon, RefreshCcwIcon } from 'lucide-react';
-import ToastManager from './toast-notifications/ToastContainer';
+import ToastManager, { ToastManagerRef, ToastDataArgs } from './toast-notifications/ToastContainer';
 import { CustomButton, NeuroButtonWrapper } from './button';
 import { AnimationKey, animations, Dialog } from './dialog-box/dialog';
+import { RadioGroup, Toggle } from 'radix-ui';
 
 const Home = () => {
-    const [toastType, setToastType] = useState<'slide' | 'fade' | 'bounce' | 'pop'>('slide');
+    const [toastAnimationType, setToastAnimationType] = useState<'slide' | 'fade' | 'bounce' | 'pop'>('slide');
     const [dialogType, setDialogType] = useState<'success' | 'confirm' | 'error' | 'alert'>('alert');
-    const toastManagerRef = useRef<any>(null);
+    const toastManagerRef = useRef<ToastManagerRef>(null);
     const [mode, setMode] = useState<'dark' | 'light'>('dark');
+    const [appearance, setAppearance] = useState<'glow' | 'gradient'>('glow');
     const [showDialog, setShowDialog] = useState(false);
     const [animationKey, setAnimationKey] = useState<AnimationKey>('popIn');
     const getIcon = (type: string) => {
@@ -17,20 +19,41 @@ const Home = () => {
             case 'success':
                 return <CircleCheckBig color='green' />;
             case 'error':
-                return <OctagonXIcon color='red' />;
+                return <OctagonXIcon color='maroon' />;
             case 'warning':
                 return <CircleAlertIcon color='orange' />;
             case 'info':
-                return <MessageSquareWarningIcon color='#60afd7' />;
+                return <MessageSquareWarningIcon color='teal' />;
             default:
                 return <CircleCheckBig color='green' />;
                 
         }
     }
+    const getGradientColor = (type: string) => {
+        switch (type) {
+            case 'success':
+                return 'rgba(34, 197, 94, 1)';
+            case 'error':
+                return 'rgba(255, 0, 0, 1)';
+            case 'warning':
+                return 'rgba(252, 211, 77, 1)';
+            case 'info':
+                return 'rgba(59, 130, 246, 1)';
+            default:  
+                return 'rgba(34, 197, 94, 1)';
+        }
+    }
     const handleAddToast = (variant: 'success' | 'error' | 'warning' | 'info') => {
       if (toastManagerRef.current) {
-        toastManagerRef.current.addToast("This is a toast message", variant, toastType, mode, getIcon(variant));
-      }
+        toastManagerRef.current.addToast({message: "This is a toast message",
+                                          mode: mode,
+                                          variant: variant,
+                                          animation: toastAnimationType,
+                                          icon: getIcon(variant),
+                                          appearance,
+                                          gradientColor: getGradientColor(variant),
+                                        });
+                                      }
     };
     const changeMode = () => {
         if(mode === 'dark') {
@@ -38,6 +61,14 @@ const Home = () => {
         }
         else {
             setMode('dark');
+        }
+    }
+    const changeAppearance = () => {
+        if(appearance === 'glow') {
+            setAppearance('gradient');
+        }
+        else {
+            setAppearance('glow');
         }
     }
     const handleOpenDialog = (key: AnimationKey) => {
@@ -62,17 +93,21 @@ const Home = () => {
             <ToastManager ref={toastManagerRef} maxToasts={3}/>
                 
             {/* </ToastManager> */}
+      <div className='mt-4 flex flex-col w-full items-center justify-center gap-2' >
+        <div className="mb-4">
+          <select
+            onChange={(e) => setToastAnimationType(e.target.value as 'slide' | 'fade' | 'bounce' | 'pop')}
+            className="p-2 border border-gray-300 rounded-lg w-full"
+          >
+            <option value="slide">Slide</option>
+            <option value="fade">Fade</option>
+            <option value="bounce">Bounce</option>
+            <option value="pop">Pop</option>
+          </select>
+        </div>
+          
+      <NeuroButtonWrapper text={`Show ${appearance === 'glow' ? 'gradient' : 'glow'} toast notification`} icon={<RefreshCcwIcon/>} handleClick={changeAppearance }/>
 
-      <div className="mb-4">
-        <select
-          onChange={(e) => setToastType(e.target.value as 'slide' | 'fade' | 'bounce' | 'pop')}
-          className="p-2 border border-gray-300 rounded-lg w-full"
-        >
-          <option value="slide">Slide</option>
-          <option value="fade">Fade</option>
-          <option value="bounce">Bounce</option>
-          <option value="pop">Pop</option>
-        </select>
       </div>
       <div className='flex flex-wrap items-center justify-between mt-4 w-full p-10'>
         <CustomButton text='Success Toast'
@@ -95,8 +130,8 @@ const Home = () => {
             className="bg-blue-400 text-white flex-1"
         />
       </div>
-      <NeuroButtonWrapper text={`Show ${mode === 'dark' ? 'light' : 'dark'} toast notification`} icon={<RefreshCcwIcon/>} handleClick={changeMode }/>
-
+      {appearance === 'glow' && <NeuroButtonWrapper text={`Show ${mode === 'dark' ? 'light' : 'dark'} toast notification`} icon={<RefreshCcwIcon/>} handleClick={changeMode }/>
+}
       <div className='mt-4 flex w-full items-center justify-center gap-2' >
         <h2>Select the type of dialog box</h2>
         <select
