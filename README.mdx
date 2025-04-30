@@ -15,8 +15,9 @@ const MyComponent: React.FC = () => {
         // variant:'success' | 'error' | 'warning' | 'info',
         // animation: 'slide' | 'fade' | 'bounce' | 'pop'
         // mode: 'dark' | 'light'
-        // icon: React.ReactNode --any Icon that you would like to be displayed before the toast message
-        toastManagerRef.current.addToast("This is a toast message", 'success', 'slide', 'dark', <CircleCheckBig color='green'/> );
+        // icon: React.ReactNode --(any Icon that you would like to be displayed before the toast message)
+        toastManagerRef.current.addToast("This is a toast message", 'success', 'slide', 'dark', 
+                                        <CircleCheckBig color='green'/> );
       }
     };
     return (
@@ -28,7 +29,8 @@ const MyComponent: React.FC = () => {
             >
                 Show Toast
             </button>
-            {/* include the ToastManager anywhere in your component and add the maximum number of toasts you would like to see on your screen at once */}
+            {/* include the ToastManager anywhere in your component and add the 
+            maximum number of toasts you would like to see on your screen at once */}
             <ToastManager ref={toastManagerRef} maxToasts={3}/>
         </div>
     );
