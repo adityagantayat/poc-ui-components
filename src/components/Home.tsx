@@ -45,7 +45,7 @@ const Home = () => {
         setShowDialog(true);
     };
     return (
-        <div className='flex flex-col items-center justify-center h-screen bg-slate-100'>
+        <div className='flex flex-col items-center justify-center bg-slate-100'>
             <h1 className='text-3xl font-bold'>Badge Component</h1>
             <div className='flex items-center justify-between mt-4 w-1/2'>
                 <BadgeComponent text="15" type="warning" variant="bounce">
