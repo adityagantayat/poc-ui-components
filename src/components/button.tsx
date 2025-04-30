@@ -2,16 +2,16 @@ import clsx from "clsx";
 export const CustomButton: React.FC<{text: string, className: string, onClick?: () => void;}>  = ({ text, className, onClick }) => {
  
     return (
-      <button onClick={onClick} className={clsx("rounded-2xl border-2 border-dotted border-black mx-2 my-2 px-6 py-3 font-semibold uppercase text-black transition-all duration-300 hover:translate-x-[-4px] hover:translate-y-[-4px] hover:rounded-md hover:shadow-[4px_4px_0px_black] active:translate-x-[0px] active:translate-y-[0px] active:rounded-2xl active:shadow-none"
+      <button onClick={onClick} className={clsx("rounded-2xl border-2  mx-2 my-2 px-6 py-3 font-semibold uppercase text-black transition-all duration-300 hover:translate-x-[-4px] hover:translate-y-[-4px] hover:rounded-md hover:shadow-[4px_4px_0px_black] active:translate-x-[0px] active:translate-y-[0px] active:rounded-2xl active:shadow-none"
                         ,className)}>
         {text}
       </button>
     );
   };
 
-  export const NeuroButtonWrapper : React.FC<{ text: string; icon: React.ReactNode, handleClick: ()=>void }> = ({ text, icon, handleClick }) => {
+  export const NeuroButtonWrapper : React.FC<{ text: string; icon?: React.ReactNode, handleClick: ()=>void }> = ({ text, icon, handleClick }) => {
     return (
-      <div className="bg-slate-100 w-full min-h-[200px] flex items-center justify-center">
+      <div className="bg-slate-100 w-full flex items-center justify-center">
         <NeumorphismButton text={text} icon={icon} handleClick={handleClick} />
       </div>
     );
