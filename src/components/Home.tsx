@@ -1,10 +1,9 @@
 import { useRef, useState } from 'react'
 import BadgeComponent from './badge/BadgeComponent';
-import { AlertCircleIcon, BellIcon, CircleAlertIcon, CircleCheckBig, FlagIcon, MailIcon, MessageSquareWarningIcon, OctagonXIcon, RefreshCcwIcon } from 'lucide-react';
-import ToastManager, { ToastManagerRef, ToastDataArgs } from './toast-notifications/ToastContainer';
+import { BellIcon, CircleAlertIcon, CircleCheckBig, FlagIcon, MailIcon, MessageSquareWarningIcon, OctagonXIcon, RefreshCcwIcon } from 'lucide-react';
+import ToastManager, { ToastManagerRef } from './toast-notifications/ToastContainer';
 import { CustomButton, NeuroButtonWrapper } from './button';
-import { AnimationKey, animations, Dialog } from './dialog-box/dialog';
-import { RadioGroup, Toggle } from 'radix-ui';
+import { AnimationKey, animations, Dialog, DialogRef } from './dialog-box/dialog';
 
 const Home = () => {
     const [toastAnimationType, setToastAnimationType] = useState<'slide' | 'fade' | 'bounce' | 'pop'>('slide');
@@ -12,8 +11,7 @@ const Home = () => {
     const toastManagerRef = useRef<ToastManagerRef>(null);
     const [mode, setMode] = useState<'dark' | 'light'>('dark');
     const [appearance, setAppearance] = useState<'glow' | 'gradient'>('glow');
-    const [showDialog, setShowDialog] = useState(false);
-    const [animationKey, setAnimationKey] = useState<AnimationKey>('popIn');
+    const dialogRef = useRef<DialogRef>(null);
     const getIcon = (type: string) => {
         switch (type) {
             case 'success':
@@ -72,8 +70,18 @@ const Home = () => {
         }
     }
     const handleOpenDialog = (key: AnimationKey) => {
-        setAnimationKey(key);
-        setShowDialog(true);
+        dialogRef.current?.open({
+            animationKey: key,
+            dialogType: dialogType,
+            title: 'Customisable Dialog header with customisable styles',
+            content: 'This is a dialog box with customisable animation and styles',
+            confirmButtonText: 'Alright !',
+            cancelButtonText: 'Cancel !',
+            confirmationCallBack: (confirm: boolean) => {
+                 confirm ? handleAddToast('success') : handleAddToast('error');
+            },
+            headerStyles: {display:'flex', textAlign: 'center'},
+        });
     };
     return (
         <div className='flex flex-col items-center justify-center bg-slate-100'>
@@ -157,32 +165,7 @@ const Home = () => {
               </button>
             ))}
           </div>
-          <Dialog show={showDialog} 
-                  animationKey={animationKey} 
-                  onClose={() => setShowDialog(false)} 
-                  dialogType={dialogType}
-                  title='Customisable Dialog header with customisable styles'
-                  confirmButtonText='Alright !'
-                  cancelButtonText='Okay !'
-                  onConfirm={() => {
-                    setShowDialog(false);
-                    handleAddToast('success');
-                    }
-                  }
-                  headerStyles={{display:'flex', textAlign: 'center'}}
-                  // defaultButtons={false}
-          >
-            <div className="flex items-center justify-between flex-col w-full">
-              <AlertCircleIcon color='orange' size={'50px'} className='mb-4' />
-              <p className="text-lg text-center p-2">This is a dialog box with {animationKey} animation.</p>
-              <p className="text-sm p-2 text-center">You can customize the content, the icon, header, header styles and content styles as needed.</p>
-              <p className="text-sm p-2 text-center">Also you can feel free to opt out of using the default buttons provided and use your own custom buttons</p>
-            </div>
-            {/* <CustomButton text='okay'
-            onClick={() => setShowDialog(false)}
-            className="bg-blue-400 text-white flex-1"
-            /> */}
-          </Dialog>
+          <Dialog ref={dialogRef}/>
         </div>
       </div>
 

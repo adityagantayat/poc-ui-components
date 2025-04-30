@@ -1,5 +1,11 @@
-import { motion, AnimatePresence, scale } from 'framer-motion';
-import { CSSProperties } from 'react';
+import { motion, AnimatePresence } from 'framer-motion';
+import { CSSProperties, forwardRef, useImperativeHandle, useState } from 'react';
+
+// types/dialog.ts
+export interface DialogRef {
+  open: (options?: DialogProps) => void;
+  close: () => void;
+}
 
 export type AnimationKey = 'popIn'
   | 'springPop'
@@ -18,9 +24,9 @@ export type AnimationKey = 'popIn'
   },
   springPop: {
     initial: { y: 100, opacity: 0, scale:0.2 },
-    animate: { y: [50, 0], opacity: 1, scale:[0.3, 1] },
-    exit: { y: 100, opacity: 0, scale:0.2 },
-    transition: { duration: 0.2, type:'spring', stiffness:200, ease: 'easeOut' },
+    animate: { y: [50, 0], opacity: 1, scale: 1, transition: { duration: 0.1, type:'spring', stiffness:200, ease: 'easeOut' }, },
+    exit: { y: 100, opacity: 0 },
+    
   },
   backdropZoom: {
       initial: { scale: 1.2, opacity: 0 },
@@ -31,7 +37,7 @@ export type AnimationKey = 'popIn'
     initial: { rotateY: -180, opacity: 0 },
     animate: { rotateY: 0, opacity: 1 },
     exit: { rotateY: -180, opacity: 0 },
-    transition: { duration: 0.5 },
+    transition: { duration: 0.2 },
   },
   skewSlide: {
     initial: { skewY: 10, y: -100, opacity: 0 },
@@ -42,29 +48,29 @@ export type AnimationKey = 'popIn'
     initial: { opacity: 0 },
     animate: { opacity: 1 },
     exit: { opacity: 0 },
-    transition: { duration: 0.5 },
+    transition: { duration: 0.2 },
   },
   skyDrop: {
     initial: { y: -300, opacity: 0 },
-    animate: { y: 0, opacity: 1 },
+    animate: { y: 0, opacity: 1, transition: { type: 'spring', stiffness: 300, damping: 15 }, },
     exit: { y: -300, opacity: 0 },
-    transition: { type: 'spring', stiffness: 300, damping: 15 },
+    
   },
 };
 
 interface DialogProps{
-  show: boolean;
   animationKey?: keyof typeof animations;
-  onClose: () => void;
-  onConfirm?: () => void;
-  dialogType: 'confirm' | 'alert' | 'error' | 'success';
-  title: string;
+  confirmationCallBack?: (confirm: boolean) => void;
+  dialogType?: 'confirm' | 'alert' | 'error' | 'success';
+  title?: string;
   confirmButtonText?: string;
   cancelButtonText?: string;
   headerStyles?: CSSProperties;
   children?: React.ReactNode;
   defaultButtons?: boolean;
+  content?: string
 }
+
 const headerGradient = (type:'confirm' | 'alert' | 'error' | 'success' ) => {
     switch (type) {
       case 'success':
@@ -79,16 +85,37 @@ const headerGradient = (type:'confirm' | 'alert' | 'error' | 'success' ) => {
         return 'bg-gradient-to-r from-gray-300 to-gray-500';
     }
   };
-export const Dialog = ({ show, animationKey = 'popIn', 
-                        onClose, dialogType, 
-                        title, onConfirm,
-                        cancelButtonText, confirmButtonText,
-                        headerStyles, children,
-                        defaultButtons=true }: DialogProps) => {
-  const anim = animations[animationKey];
+export const Dialog = forwardRef<DialogRef>((_, ref) => {
+  const [isOpen, setIsOpen] = useState(false);
+  const [options, setOptions] = useState<DialogProps>({
+    dialogType: 'alert',
+    title: 'Default Title',
+  });
+
+  useImperativeHandle(ref, () => ({
+    open: (opts?: DialogProps) => {
+      const finalOptions: DialogProps = {
+        animationKey: 'popIn',
+        confirmButtonText: 'Confirm',
+        cancelButtonText: 'Cancel',
+        defaultButtons: false,
+        ...opts, // override defaults
+      };
+      setOptions(finalOptions);
+      setIsOpen(true);
+    },
+    close: () => setIsOpen(false),
+  }));
+  const handleClose = (confirm: boolean = false) => {
+    setIsOpen(false);
+    if (options?.dialogType === 'confirm' && options?.confirmationCallBack) {
+      options?.confirmationCallBack(confirm);
+    } 
+  }
+  const anim = animations[options?.animationKey || 'popIn'];
   return (
     <AnimatePresence>
-      {show && (
+      {isOpen && (
         <div
           className="fixed inset-0 bg-black/50 flex items-center justify-center z-50"
         >
@@ -96,22 +123,22 @@ export const Dialog = ({ show, animationKey = 'popIn',
             className="bg-white rounded-xl shadow-xl max-w-md w-full max-h-[70vh] flex flex-col m-4"
             {...anim}
           >
-            <div className={`flex items-center justify-center rounded-t-xl ${headerGradient(dialogType)} p-2`}
-            style={headerStyles}>
-                <h2 className="text-xl font-bold">{title}</h2>
+            <div className={`flex items-center justify-center rounded-t-xl ${headerGradient(options?.dialogType || 'alert')} p-2`}
+            style={options?.headerStyles}>
+                <h2 className="text-xl font-bold">{options?.title}</h2>
             </div>
             <div className="p-4 flex-1 overflow-y-auto">
-                {children}
+              {options.children ?? <p>{options.content}</p>}
             </div>
-            { defaultButtons && <div className="flex items-center justify-center space-x-4  gap-4 p-4">              
+            { !options?.defaultButtons && <div className="flex items-center justify-center space-x-4  gap-4 p-4">              
                     {
-                        dialogType === 'confirm' && 
-                        <button onClick={onConfirm} className="px-6 py-2 font-medium bg-indigo-500 text-white w-fit transition-all shadow-[3px_3px_0px_black] hover:shadow-none hover:translate-x-[3px] hover:translate-y-[3px]">
-                            {confirmButtonText || 'Confirm'}
+                        options?.dialogType === 'confirm' && 
+                        <button onClick={()=>handleClose(true)} className="px-6 py-2 font-medium bg-indigo-500 text-white w-fit transition-all shadow-[3px_3px_0px_black] hover:shadow-none hover:translate-x-[3px] hover:translate-y-[3px]">
+                            {options?.confirmButtonText || 'Confirm'}
                         </button>
                     }
-                    <button onClick={onClose} className="px-6 py-2 font-medium bg-gray-100 text-black w-fit transition-all shadow-[3px_3px_0px_black] hover:shadow-none hover:translate-x-[3px] hover:translate-y-[3px]">
-                        {cancelButtonText || 'Cancel'}
+                    <button onClick={()=>handleClose(false)} className="px-6 py-2 font-medium bg-gray-100 text-black w-fit transition-all shadow-[3px_3px_0px_black] hover:shadow-none hover:translate-x-[3px] hover:translate-y-[3px]">
+                        {options?.cancelButtonText || 'Cancel'}
                     </button>
             </div>}
             
@@ -120,4 +147,4 @@ export const Dialog = ({ show, animationKey = 'popIn',
         )}
       </AnimatePresence>
     );
-};
+});
