@@ -1,4 +1,4 @@
-import React, { forwardRef, useImperativeHandle, useState } from 'react';
+import React, { forwardRef, useImperativeHandle, useRef, useState } from 'react';
 import Toast from './ToastComponent';
 import { AnimatePresence } from 'framer-motion';
 
@@ -22,22 +22,29 @@ export interface ToastManagerRef {
   
 const ToastManager = forwardRef<ToastManagerRef, ToastManagerProps>(({ maxToasts }, ref) => {
     const [toasts, setToasts] = useState<ToastProps[]>([]);
-  
+    const timeoutMapRef = useRef<Map<number, ReturnType<typeof setTimeout>>>(new Map());
     // Expose the addToast function to the parent via ref
     useImperativeHandle(ref, () => ({
       addToast: (data: ToastDataArgs) => {
         const { message, variant, animation, mode, icon, appearance = 'glow', gradientColor = 'rgba(5, 1, 1, 1)', duration = 4000 } = data;
-        setToasts((prevToasts) => {
-          if (prevToasts.length >= maxToasts) {
-            return [{ id: Date.now(), message, variant, animation, mode, icon, appearance, gradientColor, duration }, ...prevToasts.slice(0,-1)];
-          }
-          return [{ id: Date.now(), message, variant, animation, mode, icon, appearance, gradientColor, duration }, ...prevToasts];
-        });
+        const newToast = {id:Date.now() + Math.random(), message, variant, animation, mode, icon, appearance, gradientColor, duration}
+        const updatedToasts = [newToast, ...toasts];
+        // If the number of toasts exceeds maxToasts, remove the oldest one
+        if (updatedToasts.length > maxToasts) {
+          const deletedToast = updatedToasts.pop();
+          removeToast(deletedToast?.id || 0);
+        }
+        setToasts(updatedToasts);
       },
     }));
   
     const removeToast = (id: number) => {
       setToasts((prevToasts) => prevToasts.filter((toast) => toast.id !== id));
+      const timeout = timeoutMapRef.current.get(id);
+      if (timeout) {
+        clearTimeout(timeout);
+        timeoutMapRef.current.delete(id);
+      }
     };
   
     return (
@@ -50,12 +57,13 @@ const ToastManager = forwardRef<ToastManagerRef, ToastManagerProps>(({ maxToasts
             variant={toast.variant}
             message={toast.message}
             animation={toast.animation}
-            onClose={() => removeToast(toast.id)}
+            onClose={(id) => removeToast(id)}
             icon={toast.icon}
             mode={toast.mode}
             appearance={toast.appearance}
             gradientColor={toast.gradientColor}
             duration={toast.duration}
+            timeoutMapRef={timeoutMapRef}
           />
         ))}
         </AnimatePresence>

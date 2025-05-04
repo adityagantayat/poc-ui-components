@@ -4,7 +4,7 @@ import { useEffect } from 'react';
 
 interface ToastProps {
   message: string;
-  onClose: () => void; // Callback to remove the toast
+  onClose: (id: number) => void; // Callback to remove the toast
   id: number;
   variant?: 'success' | 'error' | 'info' | 'warning' | 'default'; // You can add more variants here
   animation: 'slide' | 'fade' | 'bounce' | 'pop'; // You can add more types here
@@ -13,9 +13,10 @@ interface ToastProps {
   appearance?: 'glow' | 'gradient';
   gradientColor?: string;
   duration?: number;
+  timeoutMapRef: React.RefObject<Map<number, ReturnType<typeof setTimeout>>>;
 }
 
-const Toast = ({ message, onClose, id, animation, variant='default', mode, icon, appearance='gradient', gradientColor='rgba(5, 1, 1, 1)', duration = 4000 }: ToastProps) => {
+const Toast = ({ message, onClose, id, animation, variant='default', mode, icon, appearance='gradient', gradientColor='rgba(5, 1, 1, 1)', duration = 4000, timeoutMapRef }: ToastProps) => {
   const animationVariants = {
       slide: {
           hidden: { x: '100%', opacity: 0},
@@ -97,9 +98,13 @@ const Toast = ({ message, onClose, id, animation, variant='default', mode, icon,
  
 
   useEffect(() => {
-    const timer = setTimeout(onClose, duration); 
-    return () => clearTimeout(timer); // Clear the timer when the toast is removed
-  }, [onClose, duration]);
+    const timeoutId = setTimeout(()=>onClose(id), duration); 
+    timeoutMapRef.current.set(id, timeoutId);
+    return () => {
+      clearTimeout(timeoutId);
+      timeoutMapRef.current.delete(id);
+    }; // Clear the timer when the toast is removed
+  }, [duration]);
 
   return (
     <motion.div
@@ -124,7 +129,7 @@ const Toast = ({ message, onClose, id, animation, variant='default', mode, icon,
             <span style={{color: `${gradientColor} !important`}}>{icon}</span>
             </motion.span>
         <p className={mode === 'dark' ? 'text-white' : 'text-black'}>{message}</p>
-        <button onClick={onClose} className={`ml-4 mb-2 text-xs transform hover:scale-75 ${mode === 'dark' ? 'text-white' : 'text-black'} font-semibold hover:text-gray-400`}>
+        <button onClick={()=>onClose(id)} className={`ml-4 mb-2 text-xs transform hover:scale-75 ${mode === 'dark' ? 'text-white' : 'text-black'} font-semibold hover:text-gray-400`}>
             <CircleXIcon size='16px' className=''/>
         </button>
     </motion.div>
