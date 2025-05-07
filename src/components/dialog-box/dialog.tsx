@@ -7,14 +7,14 @@ export interface DialogRef {
   close: () => void;
 }
 
-export type AnimationKey = 'popIn'
+export type DialogAnimationTypes = 'popIn'
   | 'springPop'
   | 'backdropZoom'
   | 'flip3D'
   | 'skewSlide'
   | 'glassBlur'
   | 'skyDrop';
-
+export type DialogTypes = 'success' | 'confirm' | 'error' | 'alert';
  export const animations = {
   popIn: {
     initial: { scale: 0.8, opacity: 0 },
@@ -59,9 +59,9 @@ export type AnimationKey = 'popIn'
 };
 
 interface DialogProps{
-  animationKey?: keyof typeof animations;
+  animationKey?: DialogAnimationTypes;
   confirmationCallBack?: (confirm: boolean) => void;
-  dialogType?: 'confirm' | 'alert' | 'error' | 'success';
+  dialogType?: DialogTypes;
   title?: string;
   confirmButtonText?: string;
   cancelButtonText?: string;
@@ -71,7 +71,7 @@ interface DialogProps{
   content?: string
 }
 
-const headerGradient = (type:'confirm' | 'alert' | 'error' | 'success' ) => {
+const headerGradient = (type: DialogTypes) => {
     switch (type) {
       case 'success':
         return 'bg-gradient-to-r from-green-400 to-green-600';

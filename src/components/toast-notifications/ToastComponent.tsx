@@ -99,12 +99,14 @@ const Toast = ({ message, onClose, id, animation, variant='default', mode, icon,
 
   useEffect(() => {
     const timeoutId = setTimeout(()=>onClose(id), duration); 
-    timeoutMapRef.current.set(id, timeoutId);
+    const timeoutRefMap = timeoutMapRef.current; //capture the current timeoutRefMap
+    timeoutRefMap.set(id, timeoutId);
+
     return () => {
       clearTimeout(timeoutId);
-      timeoutMapRef.current.delete(id);
-    }; // Clear the timer when the toast is removed
-  }, [duration]);
+      timeoutRefMap.delete(id); // use captured reference
+    };
+  }, [duration, id, onClose, timeoutMapRef]);
 
   return (
     <motion.div

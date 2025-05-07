@@ -1,13 +1,13 @@
 import { useRef, useState } from 'react'
 import BadgeComponent from './badge/BadgeComponent';
 import { BellIcon, CircleAlertIcon, CircleCheckBig, FlagIcon, MailIcon, MessageSquareWarningIcon, OctagonXIcon, RefreshCcwIcon } from 'lucide-react';
-import ToastManager, { ToastManagerRef } from './toast-notifications/ToastContainer';
+import ToastManager, { ToastAnimationTypes, ToastManagerRef, ToastVariantTypes } from './toast-notifications/ToastContainer';
 import { CustomButton, NeuroButtonWrapper } from './button';
-import { AnimationKey, animations, Dialog, DialogRef } from './dialog-box/dialog';
+import { DialogAnimationTypes, animations, Dialog, DialogRef, DialogTypes } from './dialog-box/dialog';
 
 const Home = () => {
-    const [toastAnimationType, setToastAnimationType] = useState<'slide' | 'fade' | 'bounce' | 'pop'>('slide');
-    const [dialogType, setDialogType] = useState<'success' | 'confirm' | 'error' | 'alert'>('alert');
+    const [toastAnimationType, setToastAnimationType] = useState<ToastAnimationTypes>('slide');
+    const [dialogType, setDialogType] = useState<DialogTypes>('alert');
     const toastManagerRef = useRef<ToastManagerRef>(null);
     const [mode, setMode] = useState<'dark' | 'light'>('dark');
     const [appearance, setAppearance] = useState<'glow' | 'gradient'>('glow');
@@ -41,7 +41,7 @@ const Home = () => {
                 return 'rgba(34, 197, 94, 1)';
         }
     }
-    const handleAddToast = (variant: 'success' | 'error' | 'warning' | 'info') => {
+    const handleAddToast = (variant: ToastVariantTypes) => {
       if (toastManagerRef.current) {
         toastManagerRef.current.addToast({message: "This is a toast message",
                                           mode: mode,
@@ -69,7 +69,7 @@ const Home = () => {
             setAppearance('glow');
         }
     }
-    const handleOpenDialog = (key: AnimationKey) => {
+    const handleOpenDialog = (key: DialogAnimationTypes) => {
         dialogRef.current?.open({
             animationKey: key,
             dialogType: dialogType,
@@ -98,13 +98,13 @@ const Home = () => {
                 </BadgeComponent>
             </div>
             <h1 className='text-3xl font-bold mt-10'>Toast Notification</h1>
-            <ToastManager ref={toastManagerRef} maxToasts={3}/>
+            <ToastManager ref={toastManagerRef} maxToasts={4}/>
                 
             {/* </ToastManager> */}
       <div className='mt-4 flex flex-col w-full items-center justify-center gap-2' >
         <div className="mb-4">
           <select
-            onChange={(e) => setToastAnimationType(e.target.value as 'slide' | 'fade' | 'bounce' | 'pop')}
+            onChange={(e) => setToastAnimationType(e.target.value as ToastAnimationTypes)}
             className="p-2 border border-gray-300 rounded-lg w-full"
           >
             <option value="slide">Slide</option>
@@ -143,7 +143,7 @@ const Home = () => {
       <div className='mt-4 flex w-full items-center justify-center gap-2' >
         <h2>Select the type of dialog box</h2>
         <select
-          onChange={(e) => setDialogType(e.target.value as 'success' | 'confirm' | 'error' | 'alert')}
+          onChange={(e) => setDialogType(e.target.value as DialogTypes)}
           className="p-2 border border-gray-300 rounded-lg"
         >
           <option value="alert">alert</option>
@@ -158,7 +158,7 @@ const Home = () => {
             {Object.keys(animations).map((key: string) => (
               <button
                 key={key}
-                onClick={() => handleOpenDialog(key as AnimationKey)}
+                onClick={() => handleOpenDialog(key as DialogAnimationTypes)}
                 className="p-4 bg-gray-200 rounded shadow"
               >
                 {key}

@@ -5,9 +5,11 @@ import { AnimatePresence } from 'framer-motion';
 interface ToastManagerProps {
   maxToasts: number; // Maximum number of toasts to display at once
 }
+export type ToastAnimationTypes = 'slide' | 'fade' | 'bounce' | 'pop';
+export type ToastVariantTypes = 'success' | 'error' | 'warning' | 'info';
 interface ToastProps { 
-  id: number; message: string; variant: 'success' | 'error' | 'warning' | 'info'; 
-  animation: 'slide' | 'fade' | 'bounce' | 'pop', 
+  id: number; message: string; variant: ToastVariantTypes; 
+  animation: ToastAnimationTypes, 
   mode: 'dark' | 'light', 
   icon: React.ReactNode,
   appearance?: 'glow' | 'gradient';
