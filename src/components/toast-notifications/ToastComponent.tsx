@@ -106,7 +106,7 @@ const Toast = ({ message, onClose, id, animation, variant='default', mode, icon,
       clearTimeout(timeoutId);
       timeoutRefMap.delete(id); // use captured reference
     };
-  }, [duration, id, onClose, timeoutMapRef]);
+  }, [duration]);
 
   return (
     <motion.div
