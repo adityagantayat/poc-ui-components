@@ -5,12 +5,14 @@ import ToastManager, { ToastAnimationTypes, ToastManagerRef, ToastVariantTypes }
 import { CustomButton, NeuroButtonWrapper } from './button';
 import { DialogAnimationTypes, animations, Dialog, DialogRef, DialogTypes } from './dialog-box/dialog';
 import { useToast } from './toast-notifications/hooks';
+import { useDialog } from './dialog-box/hooks';
 
 const Home = () => {
     const [toastAnimationType, setToastAnimationType] = useState<ToastAnimationTypes>('slide');
     const [dialogType, setDialogType] = useState<DialogTypes>('alert');
     // const toastManagerRef = useRef<ToastManagerRef>(null);
     const {addToast} = useToast();
+    const {openDialog} = useDialog()
     const [mode, setMode] = useState<'dark' | 'light'>('dark');
     const [appearance, setAppearance] = useState<'glow' | 'gradient'>('glow');
     const dialogRef = useRef<DialogRef>(null);
@@ -71,7 +73,7 @@ const Home = () => {
         }
     }
     const handleOpenDialog = (key: DialogAnimationTypes) => {
-        dialogRef.current?.open({
+        openDialog({
             animationKey: key,
             dialogType: dialogType,
             title: 'Customisable Dialog header with customisable styles',
@@ -166,7 +168,6 @@ const Home = () => {
               </button>
             ))}
           </div>
-          <Dialog ref={dialogRef}/>
         </div>
       </div>
 
