@@ -4,11 +4,13 @@ import { BellIcon, CircleAlertIcon, CircleCheckBig, FlagIcon, MailIcon, MessageS
 import ToastManager, { ToastAnimationTypes, ToastManagerRef, ToastVariantTypes } from './toast-notifications/ToastContainer';
 import { CustomButton, NeuroButtonWrapper } from './button';
 import { DialogAnimationTypes, animations, Dialog, DialogRef, DialogTypes } from './dialog-box/dialog';
+import { useToast } from './toast-notifications/hooks';
 
 const Home = () => {
     const [toastAnimationType, setToastAnimationType] = useState<ToastAnimationTypes>('slide');
     const [dialogType, setDialogType] = useState<DialogTypes>('alert');
-    const toastManagerRef = useRef<ToastManagerRef>(null);
+    // const toastManagerRef = useRef<ToastManagerRef>(null);
+    const {addToast} = useToast();
     const [mode, setMode] = useState<'dark' | 'light'>('dark');
     const [appearance, setAppearance] = useState<'glow' | 'gradient'>('glow');
     const dialogRef = useRef<DialogRef>(null);
@@ -42,8 +44,7 @@ const Home = () => {
         }
     }
     const handleAddToast = (variant: ToastVariantTypes) => {
-      if (toastManagerRef.current) {
-        toastManagerRef.current.addToast({message: "This is a toast message",
+      addToast({message: "This is a toast message",
                                           mode: mode,
                                           variant: variant,
                                           animation: toastAnimationType,
@@ -51,7 +52,7 @@ const Home = () => {
                                           appearance,
                                           gradientColor: getGradientColor(variant),
                                         });
-                                      }
+                                      
     };
     const changeMode = () => {
         if(mode === 'dark') {
@@ -98,7 +99,7 @@ const Home = () => {
                 </BadgeComponent>
             </div>
             <h1 className='text-3xl font-bold mt-10'>Toast Notification</h1>
-            <ToastManager ref={toastManagerRef} maxToasts={4}/>
+            {/* <ToastManager ref={toastManagerRef} maxToasts={4}/> */}
                 
             {/* </ToastManager> */}
       <div className='mt-4 flex flex-col w-full items-center justify-center gap-2' >

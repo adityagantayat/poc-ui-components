@@ -1,4 +1,4 @@
-import React, { forwardRef, useImperativeHandle, useRef, useState, useEffect } from 'react';
+import React, { forwardRef, useImperativeHandle, useRef, useState, useEffect, useContext, useCallback } from 'react';
 import { AnimatePresence, motion } from 'framer-motion';
 import { CrossCircledIcon } from '@radix-ui/react-icons';
 
@@ -25,6 +25,9 @@ export type ToastDataArgs = Omit<ToastContainerData, 'id'>;
 export interface ToastManagerRef {
   addToast: (data: ToastDataArgs) => void;
 }
+export const ToastContext = React.createContext<ToastManagerRef | undefined>(undefined);
+
+
 const animationVariants = {
   slide: {
       hidden: { x: '100%', opacity: 0},
@@ -86,63 +89,58 @@ const createGradient = (color: string) =>
   const fromGrad = `rgba(${arr.join(',')})`;
   return fromGrad;
 }
-//? Component for managing toast notifications
-const ToastManager = forwardRef<ToastManagerRef, ToastManagerProps>(({ maxToasts }, ref) => {
+
+
+
+export const ToastProvider = ({ children, maxToasts = 100 }: { children: React.ReactNode, maxToasts?: number }) => {
     const [toasts, setToasts] = useState<ToastContainerData[]>([]);
     const timeoutMapRef = useRef<Map<number, ReturnType<typeof setTimeout>>>(new Map());
-    // Expose the addToast function to the parent via ref
-    useImperativeHandle(ref, () => ({
-      addToast: (data: ToastDataArgs) => {
-        const { message, variant, animation, mode, icon, appearance = 'glow', gradientColor = 'rgba(5, 1, 1, 1)', duration = 4000 } = data;
-        const newToast = {id:Date.now() + Math.random(), message, variant, animation, mode, icon, appearance, gradientColor, duration}
-        const updatedToasts = [newToast, ...toasts];
-        // If the number of toasts exceeds maxToasts, remove the oldest one
-        if (updatedToasts.length > maxToasts) {
-          const deletedToast = updatedToasts.pop();
-          removeToast(deletedToast?.id || 0);
+    const removeToast = useCallback((id: number) => {
+        setToasts((prevToasts) => prevToasts.filter((toast) => toast.id !== id));
+        const timeout = timeoutMapRef.current.get(id);
+        if (timeout) {
+          clearTimeout(timeout);
+          timeoutMapRef.current.delete(id);
         }
-        setToasts(updatedToasts);
-      },
-    }));
-  
-    const removeToast = (id: number) => {
-      setToasts((prevToasts) => prevToasts.filter((toast) => toast.id !== id));
-      const timeout = timeoutMapRef.current.get(id);
-      if (timeout) {
-        clearTimeout(timeout);
-        timeoutMapRef.current.delete(id);
-      }
+      }, []);
+    const addToast = (data: ToastDataArgs) => {
+    const { message, variant, animation, mode, icon, appearance = 'glow', gradientColor = 'rgba(5, 1, 1, 1)', duration = 4000 } = data;
+    const newToast = {id:Date.now() + Math.random(), message, variant, animation, mode, icon, appearance, gradientColor, duration}
+    const updatedToasts = [newToast, ...toasts];
+    // If the number of toasts exceeds maxToasts, remove the oldest one
+    if (updatedToasts.length > maxToasts) {
+        const deletedToast = updatedToasts.pop();
+        removeToast(deletedToast?.id || 0);
+    }
+    setToasts(updatedToasts);
     };
-  
-    return (
-      <div className="fixed top-5 right-5 mt-4 mr-4 w-sm space-y-8">
-        <AnimatePresence>
-        {toasts.map((toast) => (
-          <Toast
-            key={toast.id}
-            id={toast.id}
-            variant={toast.variant}
-            message={toast.message}
-            animation={toast.animation}
-            onClose={(id) => removeToast(id)}
-            icon={toast.icon}
-            mode={toast.mode}
-            appearance={toast.appearance}
-            gradientColor={toast.gradientColor}
-            duration={toast.duration}
-            timeoutMapRef={timeoutMapRef}
-          />
-        ))}
-        </AnimatePresence>
-      </div>
-    );
-  });
-  
-  
-ToastManager.displayName = 'ToastManager'; // For better debugging and ref forwarding
 
-export default ToastManager;
-
+      return (
+        <ToastContext.Provider value={{addToast}}>
+            {children}
+            {toasts?.length && <div className="fixed top-5 right-5 mt-4 mr-4 w-sm space-y-8">
+                <AnimatePresence>
+                {toasts.map((toast) => (
+                <Toast
+                    key={toast.id}
+                    id={toast.id}
+                    variant={toast.variant}
+                    message={toast.message}
+                    animation={toast.animation}
+                    onClose={(id) => removeToast(id)}
+                    icon={toast.icon}
+                    mode={toast.mode}
+                    appearance={toast.appearance}
+                    gradientColor={toast.gradientColor}
+                    duration={toast.duration}
+                    timeoutMapRef={timeoutMapRef}
+                />
+                ))}
+                </AnimatePresence>
+            </div>}
+        </ToastContext.Provider>
+      );
+}
 
 //? Component for individual toast notifications
 const Toast = ({ message, onClose, id, animation, variant='default', mode, icon, appearance='gradient', gradientColor='rgba(5, 1, 1, 1)', duration = 4000, timeoutMapRef }: ToastNotificationProps) => {
