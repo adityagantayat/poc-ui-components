@@ -1,8 +1,7 @@
 import './App.css';
-import { Dialog } from './components/dialog-box/dialog';
 import { DialogProvider } from './components/dialog-box/dialogContext';
 import Home from './components/Home';
-import { ToastProvider } from './components/toast-notifications/ToastContext';
+import { ToastProvider } from './components/ui/toast';
 // import { MyComponent } from './components/MyComponent';
 
 function App() {

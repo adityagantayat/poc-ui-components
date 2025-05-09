@@ -2,9 +2,6 @@ import React, { forwardRef, useImperativeHandle, useRef, useState, useEffect, us
 import { AnimatePresence, motion } from 'framer-motion';
 import { CrossCircledIcon } from '@radix-ui/react-icons';
 
-interface ToastManagerProps {
-  maxToasts: number; // Maximum number of toasts to display at once
-}
 export type ToastAnimationTypes = 'slide' | 'fade' | 'bounce' | 'pop';
 export type ToastVariantTypes = 'success' | 'error' | 'warning' | 'info' | 'default';
 interface ToastContainerData { 

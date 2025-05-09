@@ -1,21 +1,22 @@
 import { useRef, useState } from 'react'
-import BadgeComponent from './badge/BadgeComponent';
+// import BadgeComponent from 'components/ui/badge/BadgeComponent';
+import { Badge } from "components/ui/badge"
 import { BellIcon, CircleAlertIcon, CircleCheckBig, FlagIcon, MailIcon, MessageSquareWarningIcon, OctagonXIcon, RefreshCcwIcon } from 'lucide-react';
-import ToastManager, { ToastAnimationTypes, ToastManagerRef, ToastVariantTypes } from './toast-notifications/ToastContainer';
+import  { ToastAnimationTypes, ToastVariantTypes } from './ui/toast/types';
 import { CustomButton, NeuroButtonWrapper } from './button';
-import { DialogAnimationTypes, animations, Dialog, DialogRef, DialogTypes } from './dialog-box/dialog';
-import { useToast } from './toast-notifications/hooks';
+import { useToast } from 'components/ui/toast/use-toast';
 import { useDialog } from './dialog-box/hooks';
+import { animations, DialogAnimationTypes, DialogTypes } from './dialog-box/dialogContext';
 
 const Home = () => {
     const [toastAnimationType, setToastAnimationType] = useState<ToastAnimationTypes>('slide');
     const [dialogType, setDialogType] = useState<DialogTypes>('alert');
     // const toastManagerRef = useRef<ToastManagerRef>(null);
     const {addToast} = useToast();
-    const {openDialog} = useDialog()
+    const {openDialog, closeDialog} = useDialog()
     const [mode, setMode] = useState<'dark' | 'light'>('dark');
     const [appearance, setAppearance] = useState<'glow' | 'gradient'>('glow');
-    const dialogRef = useRef<DialogRef>(null);
+    // const dialogRef = useRef<DialogRef>(null);
     const getIcon = (type: string) => {
         switch (type) {
             case 'success':
@@ -90,15 +91,15 @@ const Home = () => {
         <div className='flex flex-col items-center justify-center bg-slate-100'>
             <h1 className='text-3xl font-bold'>Badge Component</h1>
             <div className='flex items-center justify-between mt-4 w-1/2'>
-                <BadgeComponent text="15" type="warning" variant="bounce">
+                <Badge text="15" type="warning" variant="bounce">
                     <MailIcon className="w-10 h-10 text-black"  />
-                </BadgeComponent>
-                <BadgeComponent text="15" type="primary" >
+                </Badge>
+                <Badge text="15" type="primary" >
                     <FlagIcon className="w-10 h-10 text-black" />
-                </BadgeComponent>
-                <BadgeComponent text="15" type="error" variant="pulse">
+                </Badge>
+                <Badge text="15" type="error" variant="pulse">
                     <BellIcon className="w-10 h-10 text-black" />
-                </BadgeComponent>
+                </Badge>
             </div>
             <h1 className='text-3xl font-bold mt-10'>Toast Notification</h1>
             {/* <ToastManager ref={toastManagerRef} maxToasts={4}/> */}
