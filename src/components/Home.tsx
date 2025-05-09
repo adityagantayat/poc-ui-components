@@ -1,7 +1,7 @@
 import { useState } from 'react'
 import BadgeComponent from 'components/badge/BadgeComponent';
 import { BellIcon, CircleAlertIcon, CircleCheckBig, FlagIcon, MailIcon, MessageSquareWarningIcon, OctagonXIcon, RefreshCcwIcon } from 'lucide-react';
-import  { ToastAnimationTypes, ToastVariantTypes } from './ui/toast/types';
+import  { ToastAnimationTypes, ToastVariantTypes } from '../components/toast-notifications/ToastContext';
 import { CustomButton, NeuroButtonWrapper } from './button';
 import { useToast } from '../components/toast-notifications/hooks';
 import { useDialog } from './dialog-box/hooks';
